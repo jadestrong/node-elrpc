@@ -61,7 +61,7 @@ const startClient = (
  * @param {string[]} cmd - command for starting EPC Peer Process, such as ["node", "_echo.js"]
  * @return Promise PeerProcess
  */
-const startProcess = (cmd: string[]) => {
+const startProcess = (cmd: string[]): Promise<PeerProcess> => {
   const svr = new PeerProcess(cmd);
   try {
     return svr.start();

@@ -11,7 +11,9 @@ enum ProcessStatus {
   START_SPAWNED = "start_spawned",
   START_PORT_RECEIVE = "start_port_receive",
   START_ERROR = "start_error",
-  CLOSING = 'CLOSING',
+  CLOSING = 'closing',
+  START_ESTABLISED = 'start_establised',
+  CLOSED = 'closed',
 }
 
 export default class PeerProcess {
@@ -62,7 +64,12 @@ export default class PeerProcess {
     return d.promise.then(_port => {
       return startClient(_port).then((client) => {
         this.client = client;
-        client.addCloseHook(() => {});
+        client.addCloseHook(() => {
+          this.status = ProcessStatus.CLOSED;
+          this.process?.kill('SIGTERM');
+        });
+        this.status = ProcessStatus.START_ESTABLISED;
+        return this;
       });
     });
   }
