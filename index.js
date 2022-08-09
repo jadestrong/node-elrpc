@@ -1,1 +1,1 @@
-module.exports = require('./lib/elrpc.js');
+module.exports = require('./build/elrpc.js');
