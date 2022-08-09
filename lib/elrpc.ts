@@ -11,7 +11,7 @@ import { initLogger } from "./logger";
  * @param {number} [port]
  * @return Promise RPCServer
  */
-const startServer = (methods: Method[], port: number) => {
+const startServer = (methods: Method[], port: number): Promise<RPCServer> => {
   if (!port) port = 0; // choosed by the system
   return new Promise((resolve) => {
     const serverSocket = net.createServer((conn) => {
@@ -37,7 +37,7 @@ const startServer = (methods: Method[], port: number) => {
  * @param {string} [host]
  * @return Promise RPCServer
  */
-export const startClient = (
+const startClient = (
   port: number,
   methods?: Method[],
   host?: string
@@ -70,11 +70,11 @@ const startProcess = (cmd: string[]) => {
   }
 };
 
-module.exports = {
-  startServer: startServer,
-  startClient: startClient,
-  startProcess: startProcess,
-  Method: Method,
-  EPCStackException: EPCStackException,
-  EPCRuntimeException: EPCRuntimeException,
+export {
+  startServer,
+  startClient,
+  startProcess,
+  Method,
+  EPCStackException,
+  EPCRuntimeException,
 };

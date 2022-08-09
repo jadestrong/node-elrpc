@@ -1,35 +1,42 @@
 {
-    "name": "elrpc",
-    "version": "0.1.0",
-    "description": "EPC (RPC Stack for Emacs Lisp) for NodeJS",
-    "homepage": "https://github.com/kiwanami/node-elrpc",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/kiwanami/node-elrpc.git"
-    },
-    "private": false,
-    "scripts": {
-        "test": "mocha --require intelli-espower-loader ./test/epc.test.js",
-        "bench": "node ./test/echo-bench.js"
-    },
-    "keywords": [
-        "emacs",
-        "rpc"
-    ],
-    "author": "SAKURAI Masashi",
-    "license": "MIT",
-    "dependencies": {
-        "bluebird": "~2",
-        "elparser": "*",
-        "log4js": "^6.6.1",
-        "p-is-promise": "^1.1.0"
-    },
-    "devDependencies": {
-        "@tsconfig/recommended": "^1.0.1",
-        "@types/node": "^18.6.5",
-        "intelli-espower-loader": "*",
-        "mocha": "^10.0.0",
-        "power-assert": "*",
-        "typescript": "^4.7.4"
-    }
+  "name": "elrpc",
+  "version": "0.1.0",
+  "description": "EPC (RPC Stack for Emacs Lisp) for NodeJS",
+  "homepage": "https://github.com/kiwanami/node-elrpc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kiwanami/node-elrpc.git"
+  },
+  "private": false,
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "yarn compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch --verbose",
+    "test": "mocha --require intelli-espower-loader ./test/epc.test.js",
+    "bench": "node ./test/echo-bench.js"
+  },
+  "keywords": [
+    "emacs",
+    "rpc"
+  ],
+  "author": "SAKURAI Masashi",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "~2",
+    "elparser": "*",
+    "log4js": "^6.6.1",
+    "p-is-promise": "^1.1.0"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/node": "^18.6.5",
+    "concurrently": "^7.3.0",
+    "intelli-espower-loader": "*",
+    "mocha": "^10.0.0",
+    "power-assert": "*",
+    "typescript": "^4.7.4"
+  }
 }
