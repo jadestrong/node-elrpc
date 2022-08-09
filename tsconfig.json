@@ -12,7 +12,8 @@
     "lib": ["esnext"],
     "module": "commonjs",
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "useUnknownInCatchVariables": true
   },
   "exclude": ["node_modules", "test/**/*"]
 }

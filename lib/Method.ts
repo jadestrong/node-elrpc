@@ -1,6 +1,6 @@
 class Method {
     name: string;
-    body: any;
+    body: (...args: any[]) => void;
     argdoc: string;
     docstring: string;
 
@@ -11,7 +11,7 @@ class Method {
         this.docstring = docstring;
     }
 
-    invoke(args) {
+    invoke(...args: any[]) {
         return this.body.apply(null, args);
     }
 }

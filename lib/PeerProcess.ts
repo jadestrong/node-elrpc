@@ -1,64 +1,89 @@
 import { ChildProcess, spawn } from "child_process";
-import { initLogger } from "./elrpc";
+import { Deferred } from "./Deferred";
+import { initLogger, startClient } from "./elrpc";
+import Method from "./Method";
+import RPCServer from "./RPCServer";
 
-class PeerProcess {
-    cmd: string[];
-    status = 'not_started';
-    constructor(cmd: string[]) {
-        this.cmd = cmd;
-    }
+enum ProcessStatus {
+  NOT_STARTED = "not_started",
+  START_PRE = "start_pre",
+  START_SPAWNED = "start_spawned",
+  START_PORT_RECEIVE = "start_port_receive",
+  START_ERROR = "start_error",
+  CLOSING = 'CLOSING',
+}
 
-    start() {
-        this.status = 'start_pre';
-        const cmd = this.cmd[0];
-        const args = this.cmd.slice(1);
-        const logger = initLogger();
-        logger.debug('Process CMD: ', this.cmd.join(''));
-        return new Promise((resolve, reject) => {
-            let port: number | null = null;
-            const process = spawn(cmd, args);
-            this.status = 'start_spawned';
-            process.stdout.on('data', (data) => {
-                if (!port) {
-                    try {
-                        port = parseInt(data.toString(), 10);
-                        if (isNaN(port)) {
-                            logger.error('Wrong port number: ', data);
-                            port = null;
-                            return;
-                        }
-                        this.status = 'start_port_receive';
-                        resolve(port);
-                    } catch (e) {
-                        reject(e);
-                    }
-                } else {
-                    logger.debug(`PEER: ${data.toString()}`);
-                }
-            });
+export default class PeerProcess {
+  cmd: string[];
+  status = ProcessStatus.NOT_STARTED;
+  client: RPCServer | undefined;
+  process: ChildProcess | undefined;
 
-            process.stderr.on('data', (data) => {
-                this.status = 'start_error';
-                logger.warn(data.toString());
-            });
-        }).then(_port => {
-            return startClient(_port).then((client) => {
-                this.client = client;
-                client.addCloseHook(() => {
+  constructor(cmd: string[]) {
+    this.cmd = cmd;
+  }
 
-                });
-            });
-        });
-    }
+  start() {
+    this.status = ProcessStatus.START_PRE;
+    const d = new Deferred<number>();
+    const cmd = this.cmd[0];
+    const args = this.cmd.slice(1);
+    const logger = initLogger();
+    logger.debug("Process CMD: ", this.cmd.join(""));
+    let port: number | null = null;
+    this.process = spawn(cmd, args);
+    this.status = ProcessStatus.START_SPAWNED;
 
-    registerMethod(method) {
-    }
+    this.process.stdout?.on("data", (data) => {
+      if (!port) {
+        try {
+          port = parseInt(data.toString(), 10);
+          if (isNaN(port)) {
+            logger.error("Wrong port number: ", data);
+            port = null;
+            return;
+          }
+          this.status = ProcessStatus.START_PORT_RECEIVE;
+          d.resolve(port);
+        } catch (e) {
+          d.reject(e);
+        }
+      } else {
+        logger.debug(`PEER: ${data.toString()}`);
+      }
+    });
 
-    defineMethod(name, body, argdoc, docstring) {  }
+    this.process.stderr?.on("data", (data) => {
+      this.status = ProcessStatus.START_ERROR;
+      logger.warn(data.toString());
+    });
 
-    callMethod() {}
+    return d.promise.then(_port => {
+      return startClient(_port).then((client) => {
+        this.client = client;
+        client.addCloseHook(() => {});
+      });
+    });
+  }
 
-    queryMethod() {}
+  registerMethod(method: Method) {
+    return this.client?.registerMethod(method);
+  }
 
-    stop() {}
+  defineMethod(name: string, body: () => void, argdoc: string, docstring: string) {
+    return this.client?.defineMethod(name, body, argdoc, docstring);
+  }
+
+  callMethod(...args: any[]) {
+    return this.client?.callMethod.apply(this.client, args);
+  }
+
+  queryMethod() {
+    return this.client?.queryMethod();
+  }
+
+  stop() {
+    this.status = ProcessStatus.CLOSING;
+    return this.client?.stop();
+  }
 }
