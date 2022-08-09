@@ -1,17 +1,18 @@
 {
   "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "baseURl": './',
+    "baseURl": "./",
     "noImplicitAny": false,
     "noImlicitReturns": false,
     "outDir": "build",
     "rootDir": "/",
     "sourceMap": true,
     "strict": true,
-    "target": 'esnext',
-    "lib": [
-      "esnext"
-    ]
+    "target": "esnext",
+    "lib": ["esnext"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "test/**/*"]
 }

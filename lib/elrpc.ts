@@ -3,6 +3,7 @@ import net from "net";
 import child_process from "child_process";
 import log4js, { Logger } from "log4js";
 import elparser from "elparser";
+import { resolve } from "dns";
 
 // var Promise			= require("bluebird");
 // var isPromise		= require("p-is-promise");
@@ -17,18 +18,18 @@ const symbol = (name: string) => {
   return new elparser.ast.SExpSymbol(name);
 };
 
-var deferred = function () {
-  var resolve, reject;
-  var promise = new Promise(function (_resolve, _reject) {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  return {
-    promise: promise,
-    resolve: resolve,
-    reject: reject,
-  };
-};
+// var deferred = function () {
+//   var resolve, reject;
+//   var promise = new Promise(function (_resolve, _reject) {
+//     resolve = _resolve;
+//     reject = _reject;
+//   });
+//   return {
+//     promise: promise,
+//     resolve: resolve,
+//     reject: reject,
+//   };
+// };
 
 const padRight = (str: string, pad: string, num: number) => {
   return str.padEnd(num, pad);
@@ -36,7 +37,7 @@ const padRight = (str: string, pad: string, num: number) => {
 
 let _defaultLogger: Logger | null = null;
 
-const initLogger = () => {
+export const initLogger = () => {
   if (_defaultLogger) return _defaultLogger;
   // const appender = {
   // 	type: 'console',
@@ -69,22 +70,23 @@ const initLogger = () => {
  * @param {number} [port]
  * @return Promise RPCServer
  */
-var startServer = function (methods, port) {
-  if (!port) port = 0; // choosed by the system
-  var d = deferred();
-  var serverSocket = net.createServer(function (conn) {
-    var svr = new RPCServer("server", conn, methods);
-    svr.addCloseHook(function () {
-      serverSocket.close();
-      initLogger().debug("Stop Listening ServerSocket");
+const startServer = (methods, port: number) => {
+    if (!port) port = 0; // choosed by the system
+    return new Promise((resolve) => {
+        const serverSocket = net.createServer(conn => {
+            const svr = new RPCServer('server', conn, methods);
+            svr.addCloseHook(() => {
+                serverSocket.close();
+                initLogger().debug('Stop Listening ServerSocket');
+            });
+            resolve(svr);
+        });
+
+        serverSocket.listen(port, 'locahost', 1, () => {
+            const addr = serverSocket.address();
+            console.log(addr);
+        });
     });
-    d.resolve(svr);
-  });
-  serverSocket.listen(port, "localhost", 1, function () {
-    var addr = serverSocket.address();
-    console.log(addr.port);
-  });
-  return d.promise;
 };
 
 /**
@@ -94,18 +96,18 @@ var startServer = function (methods, port) {
  * @param {string} [host]
  * @return Promise RPCServer
  */
-var startClient = function (port, methods, host) {
+const startClient = (port: number, methods, host: string) => {
   if (!host) host = "127.0.0.1";
-  var d = deferred();
-  try {
-    var socket = net.createConnection(port, host, function () {
-      var client = new RPCServer("client", socket, methods);
-      d.resolve(client);
+    return new Promise((resolve, reject) => {
+        try {
+            const socket = net.createConnection(port, host, () => {
+                const client = new RPCServer('client', socket, methods);
+                resolve(client);
+            });
+        } catch (e) {
+            reject(e);
+        }
     });
-    return d.promise;
-  } catch (e) {
-    return Promise.reject(e);
-  }
 };
 
 /**
@@ -114,8 +116,8 @@ var startClient = function (port, methods, host) {
  * @param {string[]} cmd - command for starting EPC Peer Process, such as ["node", "_echo.js"]
  * @return Promise PeerProcess
  */
-var startProcess = function (cmd) {
-  var svr = new PeerProcess(cmd);
+const startProcess = (cmd: string[]) => {
+  const svr = new PeerProcess(cmd);
   try {
     return svr.start();
   } catch (e) {
@@ -126,7 +128,7 @@ var startProcess = function (cmd) {
 /**
  * @param {string[]} cmd command line elements: ["node", "_echo.js"]
  */
-var PeerProcess = function (cmd) {
+const PeerProcess = (cmd: string[]) => {
   this.cmd = cmd;
   this.status = "not_started";
 };
