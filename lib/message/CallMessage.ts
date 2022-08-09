@@ -8,7 +8,7 @@ class CallMessage extends Message {
   args: string[];
   deferred: Deferred<any>;
 
-  constructor(uid: number, method: Method, args, deferred: Deferred<any>) {
+  constructor(uid: number, method: Method, args: any[], deferred: Deferred<any>) {
     super(uid);
     this.method = method;
     this.args = args;

@@ -1,6 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
 import { Deferred } from "./Deferred";
-import { initLogger, startClient } from "./elrpc";
+import { startClient } from "./elrpc";
+import { initLogger } from "./logger";
 import Method from "./Method";
 import RPCServer from "./RPCServer";
 

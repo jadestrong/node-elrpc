@@ -1,5 +1,5 @@
 import Message from "./Message";
-import symbol from "./symbol";
+import symbol from "../symbol";
 
 export default class ErrorMessage extends Message {
     errorMessage: string;

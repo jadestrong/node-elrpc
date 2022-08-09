@@ -1,6 +1,5 @@
 import { Socket } from "net";
 import elparser from "elparser";
-import { initLogger } from "./elrpc";
 import Method from "./Method";
 import symbol from "./symbol";
 import { Deferred } from "./Deferred";
@@ -14,6 +13,7 @@ import {
   ErrorMessage,
 } from "./message";
 import { EPCRuntimeException, EPCStackException, Exception } from "./exception";
+import { initLogger } from "./logger";
 
 enum QueueState {
   GO,
