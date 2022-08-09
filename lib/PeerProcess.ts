@@ -24,6 +24,7 @@ export default class PeerProcess {
 
   constructor(cmd: string[]) {
     this.cmd = cmd;
+    this.status = ProcessStatus.NOT_STARTED;
   }
 
   start() {
@@ -32,7 +33,7 @@ export default class PeerProcess {
     const cmd = this.cmd[0];
     const args = this.cmd.slice(1);
     const logger = initLogger();
-    logger.debug("Process CMD: ", this.cmd.join(""));
+    logger.debug("Process CMD: ", this.cmd.join(" "));
     let port: number | null = null;
     this.process = spawn(cmd, args);
     this.status = ProcessStatus.START_SPAWNED;

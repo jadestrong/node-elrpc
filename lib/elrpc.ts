@@ -23,7 +23,7 @@ const startServer = (methods: Method[], port: number): Promise<RPCServer> => {
       resolve(svr);
     });
 
-    serverSocket.listen(port, "locahost", 1, () => {
+    serverSocket.listen(port, "localhost", 1, () => {
       const addr = serverSocket.address();
       console.log(addr);
     });
