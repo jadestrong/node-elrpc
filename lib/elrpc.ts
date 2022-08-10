@@ -25,7 +25,11 @@ const startServer = (methods: Method[], port: number): Promise<RPCServer> => {
 
     serverSocket.listen(port, "localhost", 1, () => {
       const addr = serverSocket.address();
-      console.log(addr);
+      if (typeof addr === 'string') {
+        console.log(addr);
+      } else {
+        console.log(addr?.port);
+      }
     });
   });
 };

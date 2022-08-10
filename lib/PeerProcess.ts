@@ -43,7 +43,7 @@ export default class PeerProcess {
         try {
           port = parseInt(data.toString(), 10);
           if (isNaN(port)) {
-            logger.error("Wrong port number: ", data);
+            logger.error("Wrong port number: ", data.toString());
             port = null;
             return;
           }
