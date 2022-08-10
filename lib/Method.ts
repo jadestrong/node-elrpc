@@ -11,7 +11,7 @@ class Method {
         this.docstring = docstring;
     }
 
-    invoke(...args: any[]) {
+    invoke(args: any[]) {
         return this.body.apply(null, args);
     }
 }
